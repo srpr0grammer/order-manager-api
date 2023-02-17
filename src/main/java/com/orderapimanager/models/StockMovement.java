@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity(name = "TB_STOCK_MOVEMENT")
 @Data
@@ -20,9 +19,9 @@ public class StockMovement {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToMany
+    @ManyToOne
     @JoinColumn(name = "item_id", nullable = false)
-    private List<Item> item;
+    private Item item;
 
     private LocalDateTime createdAt;
     private Integer quantity;

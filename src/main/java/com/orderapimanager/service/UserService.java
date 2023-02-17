@@ -3,9 +3,8 @@ package com.orderapimanager.service;
 
 import com.orderapimanager.models.User;
 import com.orderapimanager.repository.UserRepository;
-import com.orderapimanager.service.exception.BusinessException;
+import com.orderapimanager.service.exception.ObjectNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,7 +24,7 @@ public class UserService {
     }
     public User getById(Long id) {
         return userRepository.findById(id)
-                .orElseThrow(() -> new BusinessException("User not found", HttpStatus.NOT_FOUND.value()));
+                .orElseThrow(() -> new ObjectNotFoundException("User not found"));
     }
     public User update (User item) {
         getById(item.getId());

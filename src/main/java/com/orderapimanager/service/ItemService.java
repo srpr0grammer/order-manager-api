@@ -2,9 +2,8 @@ package com.orderapimanager.service;
 
 import com.orderapimanager.models.Item;
 import com.orderapimanager.repository.ItemRepository;
-import com.orderapimanager.service.exception.BusinessException;
+import com.orderapimanager.service.exception.ObjectNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,7 +23,7 @@ public class ItemService {
     }
     public Item getById(Long id) {
         return itemRepository.findById(id)
-                .orElseThrow(() -> new BusinessException("Item not found", HttpStatus.NOT_FOUND.value()));
+                .orElseThrow(() -> new ObjectNotFoundException("Item not found"));
     }
     public Item update (Item item) {
         getById(item.getId());

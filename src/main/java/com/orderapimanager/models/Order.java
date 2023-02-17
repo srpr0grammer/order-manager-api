@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity(name = "TB_ORDER")
 @Data
@@ -19,15 +18,14 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private LocalDateTime createdAt;
-
-    @ManyToMany
+    @ManyToOne
     @JoinColumn(name = "item_id", nullable = false)
-    private List<Item> item;
+    private Item item;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     private Integer quantidade;
-
-    @ManyToMany
-    @JoinColumn(name = "user_id", nullable = false)
-    private List<User> user;
+    private LocalDateTime createdAt;
 }
