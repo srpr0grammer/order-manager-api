@@ -3,6 +3,7 @@ package com.orderapimanager.service;
 import com.orderapimanager.models.Item;
 import com.orderapimanager.models.Order;
 import com.orderapimanager.models.StockMovement;
+import com.orderapimanager.models.User;
 import com.orderapimanager.models.dto.OrderRequest;
 import com.orderapimanager.models.dto.OrderRequestUp;
 import com.orderapimanager.repository.ItemRepository;
@@ -46,14 +47,10 @@ public class OrderService {
         order.setQuantidade(orderRequest.getQuantidade());
         order.setCreatedAt(LocalDateTime.now());
 
-        var userId = userRepository.findById(orderRequest.getUserId())
-                .orElseThrow(() -> new ObjectNotFoundException("User not found"));
-
-        var itemId = itemRepository.findById(orderRequest.getItemId())
-                        .orElseThrow(() -> new ObjectNotFoundException("Item not found"));
+        var userId = getUserById(orderRequest.getUserId());
+        var itemId = getItemById(orderRequest.getItemId());
 
         var stockQuantity = getStockQuantityForItem(itemId);
-
         if (stockQuantity < orderRequest.getQuantidade()) {
             throw new DataIntegrityViolationException("Insufficient stock for item " + itemId.getId() + ".");
         }
@@ -66,20 +63,28 @@ public class OrderService {
         var stockMovement = new StockMovement();
         stockMovement.setItem(itemId);
         stockMovement.setCreatedAt(LocalDateTime.now());
-        stockMovement.setQuantity(-orderRequest.getQuantidade());
+        stockMovement.setQuantity(orderRequest.getQuantidade());
         stockMovementRepository.save(stockMovement);
-
 
         return order;
     }
-
-    public Order getById(Long id) {
-        return orderRepository
-                .findById(id).orElseThrow(
-                        () -> new ObjectNotFoundException("Order not found"));
-    }
     public List<Order> getAll() {
         return orderRepository.findAll();
+    }
+
+    public Order getById(Long id) {
+        return orderRepository.findById(id).orElseThrow(
+                        () -> new ObjectNotFoundException("Order not found"));
+    }
+
+    private User getUserById(Long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new ObjectNotFoundException("User not found"));
+    }
+
+    private Item getItemById(Long id) {
+        return itemRepository.findById(id)
+                .orElseThrow(() -> new ObjectNotFoundException("Item not found"));
     }
 
     public Order updateOrder(OrderRequestUp orderRequestUp) {
@@ -97,7 +102,7 @@ public class OrderService {
     }
 
     private Integer getStockQuantityForItem(Item item) {
-        List<StockMovement> stockMovements = stockMovementRepository.findByItemOrderByCreatedAtAsc(item);
+        var stockMovements = stockMovementRepository.findByItemOrderByCreatedAtAsc(item);
         int totalStockQuantity = 0;
         for (StockMovement movement : stockMovements) {
             if (movement.getCreatedAt().isBefore(LocalDateTime.now())) {
